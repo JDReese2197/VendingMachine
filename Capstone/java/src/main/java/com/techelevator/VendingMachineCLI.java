@@ -1,4 +1,8 @@
 package com.techelevator;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.TreeMap;
+
 /**************************************************************************************************************************
 *  This is your Vending Machine Command Line Interface (CLI) class
 *
@@ -13,7 +17,20 @@ package com.techelevator;
 import com.techelevator.view.Menu;         // Gain access to Menu class provided for the Capstone
 
 public class VendingMachineCLI {
-
+	
+	ArrayList<Item> mountainFrankSlot = new ArrayList<>();
+	ArrayList<Item> potatoCrispsSlot = new ArrayList<>();
+	ArrayList<Item> stackersSlot = new ArrayList<>();
+	ArrayList<Item> cloudPopcornsSlot = new ArrayList<>();
+	ArrayList<Item> moonPiesSlot = new ArrayList<>();
+	ArrayList<Item> cowTailsSlot = new ArrayList<>();
+	ArrayList<Item> wonkaBarSlot = new ArrayList<>();
+	ArrayList<Item> crunchySlot = new ArrayList<>();
+	ArrayList<Item> colaSlot = new ArrayList<>();
+	ArrayList<Item> drSaltSlot = new ArrayList<>();
+	
+	HashMap<String, ArrayList> inventory = new HashMap<>();
+	
     // Main menu options defined as constants
 
 	private static final String MAIN_MENU_OPTION_DISPLAY_ITEMS = "Display Vending Machine Items";
@@ -44,6 +61,8 @@ public class VendingMachineCLI {
 	***************************************************************************************************************************/
 
 	public void run() {
+		restock();
+		createInventory();
 
 		boolean shouldProcess = true;         // Loop control variable
 		
@@ -72,6 +91,47 @@ public class VendingMachineCLI {
 /********************************************************************************************************
  * Methods used to perform processing
  ********************************************************************************************************/
+	
+	public void createInventory() {
+		inventory.put("A1", mountainFrankSlot);
+		inventory.put("A2", potatoCrispsSlot);
+		inventory.put("A3", stackersSlot);
+		inventory.put("B1", cloudPopcornsSlot);
+		inventory.put("B2", moonPiesSlot);
+		inventory.put("B3", cowTailsSlot);
+		inventory.put("B4", wonkaBarSlot);
+		inventory.put("C1", crunchySlot);
+		inventory.put("C2", colaSlot);
+		inventory.put("C3", drSaltSlot);
+	}
+	
+	public void restock() {
+		Drink  mountainFrank = new Drink("Mountain Frank", 15);
+		Chip potatoCrips = new Chip("Potato Crips", 1.5);
+		Candy stackers = new Candy("Stackers", .75);
+		Chip cloudPopcorn = new Chip("Cloud Popcorn", 5);
+		Candy moonPie = new Candy("Moon Pie", 1.25);
+		Candy cowTail = new Candy("Cow Tail", .25);
+		Candy wonkaBar = new Candy("Wonka Bar", 8);
+		Candy crunchy = new Candy("Crunchy", .50);
+		Drink  cola = new Drink("Cola", 1);
+		Drink  drSalt = new Drink("Dr. Salt", 1.75);
+		
+		
+		for( int i = 0; i < 5; i++) {
+			mountainFrankSlot.add(mountainFrank);
+			potatoCrispsSlot.add(potatoCrips);
+			stackersSlot.add(stackers);
+			cloudPopcornsSlot.add(cloudPopcorn);
+			moonPiesSlot.add(moonPie);
+			cowTailsSlot.add(cowTail);
+			wonkaBarSlot.add(wonkaBar);
+			crunchySlot.add(crunchy);
+			colaSlot.add(cola);
+			drSaltSlot.add(drSalt);
+		}
+	}
+	
 	public void displayItems() {      // static attribute used as method is not associated with specific object instance
 		// Code to display items in Vending Machine
 	}
