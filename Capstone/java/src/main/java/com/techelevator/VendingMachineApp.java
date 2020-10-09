@@ -21,7 +21,7 @@ public class VendingMachineApp {
 			
 			//  FOR TESTING PURPOSES ONLY
 			//
-			//vendingCli.restock();
+			vendingCli.restock();
 			vendingCli.displayItems();
 			//
 		}

@@ -26,7 +26,7 @@ import com.techelevator.view.Menu;         // Gain access to Menu class provided
 
 public class VendingMachineCLI {
 	
-	TreeMap<String, Map> inventory = new TreeMap<>();
+	TreeMap<String, HashMap<Item, Integer>> inventory = new TreeMap<>();
 	
 	private static final Integer MAX_STOCK = 5;
 	
@@ -61,7 +61,7 @@ public class VendingMachineCLI {
 	***************************************************************************************************************************/
 
 	public void run() throws IOException {
-		//restock();
+		restock();
 
 		boolean shouldProcess = true;         // Loop control variable
 		
@@ -109,26 +109,32 @@ public class VendingMachineCLI {
 			Item itemForSale = new Item(splitLine[1], price, splitLine[3]);
 			
 			items.clear(); 							// Clear map so previous items don't get placed in wrong slot
-			items.put(itemForSale, MAX_STOCK);
-				
+			items.put(itemForSale, 5);
+			
 			inventory.put(splitLine[0], items);
 		}
-		System.out.println("Map: " + inventory);
+		//System.out.println("Map: " + inventory);
+		System.out.println("VENDING MACHINE HAS BEEN RESTOCKED");
 		stock.close();
 	}
 	
 	public void displayItems() throws IOException {      // static attribute used as method is not associated with specific object instance
+		this.restock();
 		BufferedReader restockFile = new BufferedReader(
 				new FileReader("vendingmachine.csv"));
 		String line;
-		String itemStock;
+		Integer itemStock;
 		while((line=restockFile.readLine())!=null) {
-			Set<Item> itemSet = (inventory.get(line.substring(0, 2))).keySet();
+			HashMap<Item, Integer> items= inventory.get(line.substring(0, 2));
+			Set<Item> itemSet = items.keySet();
+			itemStock = items.get(itemSet);
 			
-			line = line.replace("Chip", "");
+			line = line.replace("Chip", "") + itemStock;
 			line = line.replace("Drink", "");
 			line = line.replace("Candy", "");
 			line = line.replace("Gum", "");
+			//System.out.println(inventory);
+			//System.out.println(inventory.get(line.substring(0, 2)));
 			System.out.println(line);
 		}
 		restockFile.close();
