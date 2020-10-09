@@ -1,6 +1,9 @@
 package com.techelevator;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,12 +56,12 @@ public class VendingMachineCLI {
 	*  should be coded
 	*
 	*  Methods should be defined following run() method and invoked from it
-	 * @throws FileNotFoundException 
+	 * @throws IOException 
 	*
 	***************************************************************************************************************************/
 
-	public void run() throws FileNotFoundException {
-		restock();
+	public void run() throws IOException {
+		//restock();
 
 		boolean shouldProcess = true;         // Loop control variable
 		
@@ -86,46 +89,29 @@ public class VendingMachineCLI {
 	}
 /********************************************************************************************************
  * Methods used to perform processing
+ * @throws IOException 
  ********************************************************************************************************/
 	
-	public void restock() throws FileNotFoundException {
-		File restockFile = new File("vendingmachine.csv");
-		Scanner stock = new Scanner(restockFile);
+	public void restock() throws IOException {
 		
-		String line;
-		
-		while(stock.hasNextLine()) {
-			HashMap<Item, Integer> items = new HashMap<>();
-			
-			line = stock.nextLine();
-			String[] splitLine = line.split("\\|");
-			
-			Double price = Double.parseDouble(splitLine[2]);
-			
-			Item itemForSale = new Item(splitLine[1], price, splitLine[3]);
-			
-			items.clear(); 							// Clear map so previous items don't get placed in wrong slot
-			items.put(itemForSale, MAX_STOCK);
-				
-			inventory.put(splitLine[0], items);
-		}
-		System.out.println("Map: " + inventory);
-		stock.close();
+
 	}
 	
-	public void displayItems() {      // static attribute used as method is not associated with specific object instance
+	public void displayItems() throws IOException {      // static attribute used as method is not associated with specific object instance
 		/* Create a set of keys to iterate through inventory map
 		 * go through inventory map one key at a time
 		 * 	for each key print out the Key, Item name, Item price, Length of Item array list
 		 */
-		Set<String> inventoryKeys = inventory.keySet();
-		for(String aKey : inventoryKeys) {
-			Map<Object, Object> currentMap = inventory.get(aKey);
-			Set<Object> itemKey = currentMap.keySet();
-			
-			//System.out.println(aKey + "  | " + itemKey + "   |  " + currentMap.get(itemKey) + "   |  " + currentMap);
+		BufferedReader restockFile = new BufferedReader(
+				new FileReader("vendingmachine.csv"));
+		String line;
+		while((line=restockFile.readLine())!=null) {
+			System.out.println(line);
 		}
-	}
+		restockFile.close();
+	}	
+
+	
 	
 	public void purchaseItems() {	 // static attribute used as method is not associated with specific object instance
 		// Code to purchase items from Vending Machine
