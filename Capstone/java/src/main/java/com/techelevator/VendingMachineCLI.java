@@ -1,6 +1,11 @@
 package com.techelevator;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Set;
 import java.util.TreeMap;
 
 /**************************************************************************************************************************
@@ -18,18 +23,9 @@ import com.techelevator.view.Menu;         // Gain access to Menu class provided
 
 public class VendingMachineCLI {
 	
-	ArrayList<Item> mountainFrankSlot = new ArrayList<>();
-	ArrayList<Item> potatoCrispsSlot = new ArrayList<>();
-	ArrayList<Item> stackersSlot = new ArrayList<>();
-	ArrayList<Item> cloudPopcornsSlot = new ArrayList<>();
-	ArrayList<Item> moonPiesSlot = new ArrayList<>();
-	ArrayList<Item> cowTailsSlot = new ArrayList<>();
-	ArrayList<Item> wonkaBarSlot = new ArrayList<>();
-	ArrayList<Item> crunchySlot = new ArrayList<>();
-	ArrayList<Item> colaSlot = new ArrayList<>();
-	ArrayList<Item> drSaltSlot = new ArrayList<>();
+	TreeMap<String, Map> inventory = new TreeMap<>();
 	
-	HashMap<String, ArrayList> inventory = new HashMap<>();
+	private static final Integer MAX_STOCK = 5;
 	
     // Main menu options defined as constants
 
@@ -57,12 +53,12 @@ public class VendingMachineCLI {
 	*  should be coded
 	*
 	*  Methods should be defined following run() method and invoked from it
+	 * @throws FileNotFoundException 
 	*
 	***************************************************************************************************************************/
 
-	public void run() {
+	public void run() throws FileNotFoundException {
 		restock();
-		createInventory();
 
 		boolean shouldProcess = true;         // Loop control variable
 		
@@ -92,48 +88,43 @@ public class VendingMachineCLI {
  * Methods used to perform processing
  ********************************************************************************************************/
 	
-	public void createInventory() {
-		inventory.put("A1", mountainFrankSlot);
-		inventory.put("A2", potatoCrispsSlot);
-		inventory.put("A3", stackersSlot);
-		inventory.put("B1", cloudPopcornsSlot);
-		inventory.put("B2", moonPiesSlot);
-		inventory.put("B3", cowTailsSlot);
-		inventory.put("B4", wonkaBarSlot);
-		inventory.put("C1", crunchySlot);
-		inventory.put("C2", colaSlot);
-		inventory.put("C3", drSaltSlot);
-	}
-	
-	public void restock() {
-		Drink  mountainFrank = new Drink("Mountain Frank", 15);
-		Chip potatoCrips = new Chip("Potato Crips", 1.5);
-		Candy stackers = new Candy("Stackers", .75);
-		Chip cloudPopcorn = new Chip("Cloud Popcorn", 5);
-		Candy moonPie = new Candy("Moon Pie", 1.25);
-		Candy cowTail = new Candy("Cow Tail", .25);
-		Candy wonkaBar = new Candy("Wonka Bar", 8);
-		Candy crunchy = new Candy("Crunchy", .50);
-		Drink  cola = new Drink("Cola", 1);
-		Drink  drSalt = new Drink("Dr. Salt", 1.75);
+	public void restock() throws FileNotFoundException {
+		File restockFile = new File("vendingmachine.csv");
+		Scanner stock = new Scanner(restockFile);
 		
+		String line;
 		
-		for( int i = 0; i < 5; i++) {
-			mountainFrankSlot.add(mountainFrank);
-			potatoCrispsSlot.add(potatoCrips);
-			stackersSlot.add(stackers);
-			cloudPopcornsSlot.add(cloudPopcorn);
-			moonPiesSlot.add(moonPie);
-			cowTailsSlot.add(cowTail);
-			wonkaBarSlot.add(wonkaBar);
-			crunchySlot.add(crunchy);
-			colaSlot.add(cola);
-			drSaltSlot.add(drSalt);
+		while(stock.hasNextLine()) {
+			HashMap<Item, Integer> items = new HashMap<>();
+			
+			line = stock.nextLine();
+			String[] splitLine = line.split("\\|");
+			
+			Double price = Double.parseDouble(splitLine[2]);
+			
+			Item itemForSale = new Item(splitLine[1], price, splitLine[3]);
+			
+			items.clear(); 							// Clear map so previous items don't get placed in wrong slot
+			items.put(itemForSale, MAX_STOCK);
+				
+			inventory.put(splitLine[0], items);
 		}
+		System.out.println("Map: " + inventory);
+		stock.close();
 	}
 	
 	public void displayItems() {      // static attribute used as method is not associated with specific object instance
-		// Code to display items in Vending Machine
+		/* Create a set of keys to iterate through inventory map
+		 * go through inventory map one key at a time
+		 * 	for each key print out the Key, Item name, Item price, Length of Item array list
+		 */
+		Set<String> inventoryKeys = inventory.keySet();
+		for(String aKey : inventoryKeys) {
+			Map<Object, Object> currentMap = inventory.get(aKey);
+			Set<Object> itemKey = currentMap.keySet();
+			
+			//System.out.println(aKey + "  | " + itemKey + "   |  " + currentMap.get(itemKey) + "   |  " + currentMap);
+		}
 	}
 	
 	public void purchaseItems() {	 // static attribute used as method is not associated with specific object instance

@@ -1,12 +1,14 @@
 package com.techelevator;
 
-public abstract class Item {
+public class Item {
 	private String name;
 	private double price;
+	String itemType;
 	
-	public Item(String name, double price) {
+	public Item(String name, double price, String type) {
 		this.name = name;
 		this.price = price;
+		itemType = type;
 	}
 
 	public String getName() {
@@ -17,5 +19,13 @@ public abstract class Item {
 		return price;
 	}
 	
-	public abstract String getDispenseMessage();
+	public String getDispenseMessage() {
+													//  TODO : ADD MESSAGE AND LOGIC
+		return "Temp message";
+	}
+	
+	@Override
+	public String toString() {
+		return this.name + " " + this.price;
+	}
 }
