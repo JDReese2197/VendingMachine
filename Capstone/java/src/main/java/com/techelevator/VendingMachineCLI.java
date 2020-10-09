@@ -93,19 +93,42 @@ public class VendingMachineCLI {
  ********************************************************************************************************/
 	
 	public void restock() throws IOException {
+		File restockFile = new File("vendingmachine.csv");
+		Scanner stock = new Scanner(restockFile);
 		
-
+		String line;
+		
+		while(stock.hasNextLine()) {
+			HashMap<Item, Integer> items = new HashMap<>();
+			
+			line = stock.nextLine();
+			String[] splitLine = line.split("\\|");
+			
+			Double price = Double.parseDouble(splitLine[2]);
+			
+			Item itemForSale = new Item(splitLine[1], price, splitLine[3]);
+			
+			items.clear(); 							// Clear map so previous items don't get placed in wrong slot
+			items.put(itemForSale, MAX_STOCK);
+				
+			inventory.put(splitLine[0], items);
+		}
+		System.out.println("Map: " + inventory);
+		stock.close();
 	}
 	
 	public void displayItems() throws IOException {      // static attribute used as method is not associated with specific object instance
-		/* Create a set of keys to iterate through inventory map
-		 * go through inventory map one key at a time
-		 * 	for each key print out the Key, Item name, Item price, Length of Item array list
-		 */
 		BufferedReader restockFile = new BufferedReader(
 				new FileReader("vendingmachine.csv"));
 		String line;
+		String itemStock;
 		while((line=restockFile.readLine())!=null) {
+			Set<Item> itemSet = (inventory.get(line.substring(0, 2))).keySet();
+			
+			line = line.replace("Chip", "");
+			line = line.replace("Drink", "");
+			line = line.replace("Candy", "");
+			line = line.replace("Gum", "");
 			System.out.println(line);
 		}
 		restockFile.close();
