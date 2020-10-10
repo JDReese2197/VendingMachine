@@ -3,13 +3,17 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeMap;
+import java.text.SimpleDateFormat;  
+import java.util.Date;  
 
 /**************************************************************************************************************************
 *  This is your Vending Machine Command Line Interface (CLI) class
@@ -25,6 +29,8 @@ import java.util.TreeMap;
 import com.techelevator.view.Menu;         // Gain access to Menu class provided for the Capstone
 
 public class VendingMachineCLI {
+	File logFile = new File("Log.txt");
+	FileWriter logger;
 	
 	Inventory itemInventory;
 	Money machineMoney = new Money();
@@ -93,6 +99,7 @@ public class VendingMachineCLI {
 					break;                    // Exit switch statement
 			}	
 		}
+		logger.close();
 		return;                               // End method and return to caller
 	}
 /********************************************************************************************************
@@ -111,9 +118,9 @@ public class VendingMachineCLI {
 	public void purchaseItems() throws IOException {	 // static attribute used as method is not associated with specific object instance
 		// Code to purchase items from Vending Machine
 		// 
-		boolean shouldProcess = true;         // Loop control variable
+		boolean shouldProcessSub = true;         // Loop control variable
 		
-		while(shouldProcess) {                // Loop until user indicates they want to exit
+		while(shouldProcessSub) {                // Loop until user indicates they want to exit
 			
 			String choice = (String)vendingMenu.getChoiceFromOptions(SUB_MENU_OPTIONS);  // Display menu and get choice
 			
@@ -128,22 +135,28 @@ public class VendingMachineCLI {
 					break;                    // Exit switch statement
 			
 				case SUB_MENU_FINISH_TRANSACTION:
-					//endMethodProcessing();    // Invoke method to perform end of method processing
-					shouldProcess = false;    // Set variable to end loop
+					double initialMoney = machineMoney.getCurrentMoney();
+					machineMoney.returnChange();
+					System.out.println("Remaining Balance: $" + machineMoney.getCurrentMoney());// Invoke method to perform end of method processing
+					shouldProcessSub = false;    // Set variable to end loop
+					generateLog("GIVE CHANGE", initialMoney);
 					break;                    // Exit switch statement
 			}	
 		}
 	}
 	
-	public void feedMoney() {
+	public void feedMoney() throws IOException {
+		double initialMoney = machineMoney.getCurrentMoney();
 		Scanner input = new Scanner(System.in);
 		System.out.println("Please insert a bill of the following type: \n"
 				+ "$1, $2, $5, $10");
 		String userInput = input.nextLine();
 		System.out.println(machineMoney.addMoney(Integer.parseInt(userInput)));
+		generateLog("FEED MONEY", initialMoney);
 	}
 	
 	public void selectProduct() throws IOException {
+		double initialMoney = machineMoney.getCurrentMoney();
 		Scanner input = new Scanner(System.in);
 		
 		System.out.println("Vending Machine Items: ");
@@ -157,19 +170,27 @@ public class VendingMachineCLI {
 		//if slot is valid:
 		if(itemInventory.isValidSlot(userInput)) {
 			Item selectedItem = itemInventory.getItem(userInput);
+			
+			
 		//	if item is in stock:
 			if(!itemInventory.isSoldOut(userInput) && machineMoney.hasEnoughMoney(selectedItem.getPrice())) {
 		//		decrement item stock by one
 				itemInventory.decrementStock(userInput);
+		
 		//		dispense item to customer
 				System.out.println("You bought: " + selectedItem);
 				System.out.println("There are now " + itemInventory.getStock(userInput) + " "
 									+ selectedItem.getName() + " remaining");
 				System.out.println(selectedItem.getDispenseMessage());
+		
 		//		subtract cost of item from total money
-				System.out.println("Remaining Money: " + machineMoney.subtractMoney(selectedItem.getPrice()));
+				System.out.println("Remaining Money: $" + machineMoney.subtractMoney(selectedItem.getPrice()));
+
+				// Generates log event
+				generateLog(selectedItem.getName() + " " + userInput, initialMoney);
 				return;
 			}
+			
 			//	if item is not in stock:
 			else if(itemInventory.isSoldOut(userInput)) {
 				//		let customer know
@@ -177,6 +198,7 @@ public class VendingMachineCLI {
 				//		return to purchase menu
 				return;
 			}
+			
 			else if(!(machineMoney.hasEnoughMoney(selectedItem.getPrice()))) {
 				System.out.println("You're too broke.  Leave.\n"
 						+ "The item costs: $" + selectedItem.getPrice() +
@@ -193,7 +215,17 @@ public class VendingMachineCLI {
 		}
 	}
 	
+	public void generateLog(String logEvent, double prevMoney) throws IOException {
+		logger = new FileWriter(logFile, true);
+		
+	    SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a");  
+	    Date date = new Date();
+	    String formattedDate = formatter.format(date);
+		
+		logger.append("\n" + formattedDate + " " + logEvent + ": $" + prevMoney + " $" + machineMoney.getCurrentMoney());
+	}
+	
 	public void endMethodProcessing() { // static attribute used as method is not associated with specific object instance
-		// Any processing that needs to be done before method ends
+		
 	}
 }
