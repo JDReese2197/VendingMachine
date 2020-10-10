@@ -97,9 +97,10 @@ public class VendingMachineCLI {
 		Scanner stock = new Scanner(restockFile);
 		
 		String line;
+		HashMap<Item, Integer> items;
 		
 		while(stock.hasNextLine()) {
-			HashMap<Item, Integer> items = new HashMap<>();
+			items = new HashMap<>();
 			
 			line = stock.nextLine();
 			String[] splitLine = line.split("\\|");
@@ -109,11 +110,11 @@ public class VendingMachineCLI {
 			Item itemForSale = new Item(splitLine[1], price, splitLine[3]);
 			
 			items.clear(); 							// Clear map so previous items don't get placed in wrong slot
-			items.put(itemForSale, 5);
+			items.put(itemForSale, MAX_STOCK);
 			
 			inventory.put(splitLine[0], items);
 		}
-		//System.out.println("Map: " + inventory);
+		System.out.println("Map: " + inventory);
 		System.out.println("VENDING MACHINE HAS BEEN RESTOCKED");
 		stock.close();
 	}
@@ -123,11 +124,15 @@ public class VendingMachineCLI {
 		BufferedReader restockFile = new BufferedReader(
 				new FileReader("vendingmachine.csv"));
 		String line;
-		Integer itemStock;
+		Integer itemStock = 0;;
 		while((line=restockFile.readLine())!=null) {
 			HashMap<Item, Integer> items= inventory.get(line.substring(0, 2));
 			Set<Item> itemSet = items.keySet();
-			itemStock = items.get(itemSet);
+			
+			for(Item anItem : itemSet) {
+				itemStock = items.get(anItem);
+			}
+			//itemStock = items.get(itemSet);
 			
 			line = line.replace("Chip", "") + itemStock;
 			line = line.replace("Drink", "");
