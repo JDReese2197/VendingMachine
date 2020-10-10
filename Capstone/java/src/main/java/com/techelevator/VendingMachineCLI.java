@@ -76,6 +76,7 @@ public class VendingMachineCLI {
 
 	public void run() throws IOException {
 		itemInventory = new Inventory();
+		logger = new FileWriter(logFile, true);
 
 		boolean shouldProcess = true;         // Loop control variable
 		
@@ -216,8 +217,6 @@ public class VendingMachineCLI {
 	}
 	
 	public void generateLog(String logEvent, double prevMoney) throws IOException {
-		logger = new FileWriter(logFile, true);
-		
 	    SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a");  
 	    Date date = new Date();
 	    String formattedDate = formatter.format(date);
