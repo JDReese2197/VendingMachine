@@ -20,12 +20,22 @@ public class Item {
 	}
 	
 	public String getDispenseMessage() {
-													//  TODO : ADD MESSAGE AND LOGIC
-		return "Temp message";
+		String dispenseMessage = "";
+		switch(this.itemType) {
+			case "Chip":
+				dispenseMessage = "Crunch Crunch, Yum!";
+			case "Candy":
+				dispenseMessage = "Munch Munch, Yum!";
+			case "Drink":
+				dispenseMessage = "Glug Glug, Yum!";
+			case "Gum":
+				dispenseMessage = "Chew Chew, Yum!";
+		}
+		return dispenseMessage;
 	}
 	
 	@Override
 	public String toString() {
-		return this.name + " " + this.price;
+		return this.name + " - $" + this.price;
 	}
 }
