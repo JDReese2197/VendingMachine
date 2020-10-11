@@ -102,7 +102,18 @@ public class Inventory {
 	
 	//				IS VALID SLOT METHOD
 	public boolean isValidSlot(String slot) {
-		boolean isValid = inventory.containsKey(slot);  //TODO MAKE NOT CASE SENSITIVE
+		boolean isValid = inventory.containsKey(slot);
+//		}
 		return isValid;
+	}
+	
+	
+	public Set<String> getSlots() {
+		Set<String> slots = inventory.keySet();
+		return slots;
+	}
+	
+	public Integer getMaxStock() {
+		return MAX_STOCK;
 	}
 }

@@ -1,17 +1,8 @@
 package com.techelevator;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
-import java.util.TreeMap;
 import java.text.SimpleDateFormat;  
 import java.util.Date;  
 
@@ -31,6 +22,7 @@ import com.techelevator.view.Menu;         // Gain access to Menu class provided
 public class VendingMachineCLI {
 	File logFile = new File("Log.txt");
 	FileWriter logger;
+	Scanner input;
 	
 	Inventory itemInventory;
 	Money machineMoney = new Money();
@@ -42,9 +34,11 @@ public class VendingMachineCLI {
 	private static final String MAIN_MENU_OPTION_DISPLAY_ITEMS = "Display Vending Machine Items";
 	private static final String MAIN_MENU_OPTION_PURCHASE      = "Purchase";
 	private static final String MAIN_MENU_OPTION_EXIT          = "Exit";
+	private static final String MAIN_MENU_OPTION_SALES_REPORT  = "Generate Sales Report";
 	private static final String[] MAIN_MENU_OPTIONS = { MAIN_MENU_OPTION_DISPLAY_ITEMS,
 													    MAIN_MENU_OPTION_PURCHASE,
-													    MAIN_MENU_OPTION_EXIT
+													    MAIN_MENU_OPTION_EXIT,
+													    MAIN_MENU_OPTION_SALES_REPORT
 													    };
 	private static final String SUB_MENU_FEED_MONEY = "Feed Money";
 	private static final String SUB_MENU_SELECT_PRODUCT = "Select Product";
@@ -77,6 +71,7 @@ public class VendingMachineCLI {
 	public void run() throws IOException {
 		itemInventory = new Inventory();
 		logger = new FileWriter(logFile, true);
+		input = new Scanner(System.in);
 
 		boolean shouldProcess = true;         // Loop control variable
 		
@@ -98,8 +93,12 @@ public class VendingMachineCLI {
 					endMethodProcessing();    // Invoke method to perform end of method processing
 					shouldProcess = false;    // Set variable to end loop
 					break;                    // Exit switch statement
+				case MAIN_MENU_OPTION_SALES_REPORT:
+					generateSalesReport();
+					break;
 			}	
 		}
+		input.close();
 		logger.close();
 		return;                               // End method and return to caller
 	}
@@ -148,7 +147,6 @@ public class VendingMachineCLI {
 	
 	public void feedMoney() throws IOException {
 		double initialMoney = machineMoney.getCurrentMoney();
-		Scanner input = new Scanner(System.in);
 		System.out.println("Please insert a bill of the following type: \n"
 				+ "$1, $2, $5, $10");
 		String userInput = input.nextLine();
@@ -158,14 +156,13 @@ public class VendingMachineCLI {
 	
 	public void selectProduct() throws IOException {
 		double initialMoney = machineMoney.getCurrentMoney();
-		Scanner input = new Scanner(System.in);
 		
 		System.out.println("Vending Machine Items: ");
 		itemInventory.displayItems();
 		
 		//Prompt user for input
 		System.out.print("Please enter the slot ID of the Item you'd like:  ");
-		String userInput = input.nextLine();
+		String userInput = input.nextLine().toUpperCase();
 		//Validate input is an existing slot
 		
 		//if slot is valid:
@@ -189,7 +186,6 @@ public class VendingMachineCLI {
 
 				// Generates log event
 				generateLog(selectedItem.getName() + " " + userInput, initialMoney);
-				return;
 			}
 			
 			//	if item is not in stock:
@@ -201,16 +197,15 @@ public class VendingMachineCLI {
 			}
 			
 			else if(!(machineMoney.hasEnoughMoney(selectedItem.getPrice()))) {
-				System.out.println("You're too broke.  Leave.\n"
+				System.out.println("I'm sorry.  You don't seem to have the funds for that.\n"
 						+ "The item costs: $" + selectedItem.getPrice() +
 						" while you only have: $" + machineMoney.getCurrentMoney());
-				return;
 			}
 		}
 		//if slot is invalid:
 		else if(!itemInventory.isValidSlot(userInput)) {
 			//	let user know
-			System.out.println("That slot doesn't exist.  Please read and type more carefully next time.");
+			System.out.println("That slot doesn't exist.  Please try again.");
 			//	return to purchase menu
 			return;
 		}
@@ -223,8 +218,26 @@ public class VendingMachineCLI {
 		
 		logger.append("\n" + formattedDate + " " + logEvent + ": $" + prevMoney + " $" + machineMoney.getCurrentMoney());
 	}
+
+	public void generateSalesReport() {
+		System.out.println("\n                 SALES REPORT");
+		//create total sales variable
+		double totalSales = 0;
+		int amountSold = 0;
+		//iterate through inventory map
+		for(String slotId : itemInventory.getSlots()) {
+			//	get stock of each item, subtract from max stock to get amount sold
+			amountSold = itemInventory.getMaxStock() - itemInventory.getStock(slotId);
+			//	multiply sold amount by item price and add to total sales
+			totalSales += amountSold * itemInventory.getItem(slotId).getPrice();
+			//	print item name and amount sold
+			System.out.println(itemInventory.getItem(slotId).getName() + " | " + amountSold);
+		}
+		//print total sales
+		System.out.println("Total Sales: $" + totalSales);
+	}
 	
-	public void endMethodProcessing() { // static attribute used as method is not associated with specific object instance
-		
+	public void endMethodProcessing() {
+		System.out.println("\nThank you for shopping with us today!");
 	}
 }

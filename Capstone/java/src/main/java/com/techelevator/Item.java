@@ -24,12 +24,16 @@ public class Item {
 		switch(this.itemType) {
 			case "Chip":
 				dispenseMessage = "Crunch Crunch, Yum!";
+				break;
 			case "Candy":
 				dispenseMessage = "Munch Munch, Yum!";
+				break;
 			case "Drink":
 				dispenseMessage = "Glug Glug, Yum!";
+				break;
 			case "Gum":
 				dispenseMessage = "Chew Chew, Yum!";
+				break;
 		}
 		return dispenseMessage;
 	}
